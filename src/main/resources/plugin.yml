@@ -1,0 +1,4 @@
+name: TownyRangeLimit
+version: '${project.version}'
+main: org.aubrithehuman.townyrangelimit.TownyRangeLimit
+api-version: 1.19
