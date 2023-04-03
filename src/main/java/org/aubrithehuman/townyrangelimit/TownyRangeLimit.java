@@ -370,7 +370,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
      *
      * @param worldCoord
      * @return
-     * @author Isaac
+     * @author NinjaMandalorian
      */
     private static ArrayList<WorldCoord> getAdjCells(WorldCoord worldCoord) {
         ArrayList<WorldCoord> ReturnList = new ArrayList<WorldCoord>();
@@ -395,7 +395,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
     /** Gets all adjacently connected townblocks
      * @param chunkCoord - WorldCoord to check at
      * @return List of WorldCoords
-     * @author Isaac
+     * @author NinjaMandalorian
      */
     public static ArrayList<WorldCoord> getCluster(WorldCoord chunkCoord){
         // WCoordList is the returning array, SearchList is the to-search list.
