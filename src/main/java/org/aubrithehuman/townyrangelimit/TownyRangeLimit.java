@@ -110,9 +110,9 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
 
     /**
      * Finds the shortest distance (in townblocks) between two towns
-     * @param town1
-     * @param town2
-     * @return
+     * @param town1 town1
+     * @param town2 town1
+     * @return shortest distance
      */
     private static int shortestDistance(Town town1, Town town2) {
         //max possible range (60M*sqrt2)
@@ -143,7 +143,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                        }
                 }
 
-                //if we didnt find anything for some reason? idk its worth putting
+                //if we didn't find anything for some reason? IDK its worth putting
                 if(nearestInviter == null) {
                     return dist;
                 }
@@ -177,9 +177,9 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
 
     /**
      * Finds the shortest distance (in townblocks) between a town and a nation
-     * @param town
-     * @param nation
-     * @return
+     * @param town town
+     * @param nation nation
+     * @return shortest distance
      */
     private static int shortestDistance(Town town, Nation nation) {
         //max possible range (60M*sqrt2)
@@ -190,10 +190,10 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 ArrayList<WorldCoord> clusterInvited = getCluster(town.getHomeBlock().getWorldCoord());
                 WorldCoord invitedHomeblock = town.getHomeBlock().getWorldCoord();
 
-                //Grab all of the towns in the nation
+                //Grab all the towns in the nation
                 List<Town> nation1Towns = nation.getTowns();
-                ArrayList<ArrayList<WorldCoord>> clustersInviter = new ArrayList<ArrayList<WorldCoord>>();
-                ArrayList<WorldCoord> inviterHomeblocks = new ArrayList<WorldCoord>();
+                ArrayList<ArrayList<WorldCoord>> clustersInviter = new ArrayList<>();
+                ArrayList<WorldCoord> inviterHomeblocks = new ArrayList<>();
                 for (Town t : nation1Towns) {
                     clustersInviter.add(getCluster(nation.getCapital().getHomeBlock().getWorldCoord()));
                     //grab homeblocks
@@ -221,7 +221,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                     }
                 }
 
-                //if we didnt find anything for some reason? idk its worth putting
+                //if we didn't find anything for some reason? IDK its worth putting
                 if(nearestInvited == null) {
                     return dist;
                 }
@@ -255,9 +255,9 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
 
     /**
      * Finds the shortest distance (in townblocks) between two nations
-     * @param nation1
-     * @param nation2
-     * @return
+     * @param nation1 nation1
+     * @param nation2 nation2
+     * @return shortest distance
      */
 
     private static int shortestDistance(Nation nation1, Nation nation2) {
@@ -267,20 +267,20 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
         if (nation1 != null && nation2 != null) {
             try {
 
-                //Grab all of the towns in the nation
+                //Grab all the towns in the nation
                 List<Town> nation1Towns = nation1.getTowns();
-                ArrayList<ArrayList<WorldCoord>> clustersInviter = new ArrayList<ArrayList<WorldCoord>>();
-                ArrayList<WorldCoord> inviterHomeblocks = new ArrayList<WorldCoord>();
+                ArrayList<ArrayList<WorldCoord>> clustersInviter = new ArrayList<>();
+                ArrayList<WorldCoord> inviterHomeblocks = new ArrayList<>();
                 for (Town t : nation1Towns) {
                     clustersInviter.add(getCluster(nation1.getCapital().getHomeBlock().getWorldCoord()));
                     inviterHomeblocks.add(t.getHomeBlock().getWorldCoord());
 
                 }
 
-                //Grab all of the towns in the nation
+                //Grab all the towns in the nation
                 List<Town> nation2Towns = nation2.getTowns();
-                ArrayList<ArrayList<WorldCoord>> clustersInvited = new ArrayList<ArrayList<WorldCoord>>();
-                ArrayList<WorldCoord> invitedHomeblocks = new ArrayList<WorldCoord>();
+                ArrayList<ArrayList<WorldCoord>> clustersInvited = new ArrayList<>();
+                ArrayList<WorldCoord> invitedHomeblocks = new ArrayList<>();
                 for (Town t : nation2Towns) {
                     clustersInvited.add(getCluster(nation2.getCapital().getHomeBlock().getWorldCoord()));
                     invitedHomeblocks.add(t.getHomeBlock().getWorldCoord());
@@ -288,7 +288,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 }
 
                 //This may take forever :skull: at like multiple 900 size towns it takes like 1mil iterations?????
-                //idk how tf else to check this
+                //IDK how tf else to check this
                 //find nearest block to invited homeblock
 
                 WorldCoord nearestInvited1 = null;
@@ -368,12 +368,12 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
 
     /**
      *
-     * @param worldCoord
-     * @return
+     * @param worldCoord worldCoord
+     * @return List of connected chunks
      * @author NinjaMandalorian
      */
     private static ArrayList<WorldCoord> getAdjCells(WorldCoord worldCoord) {
-        ArrayList<WorldCoord> ReturnList = new ArrayList<WorldCoord>();
+        ArrayList<WorldCoord> ReturnList = new ArrayList<>();
 
         int[][] XZarray = new int[][]{
                 {-1, 0},
@@ -399,8 +399,8 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
      */
     public static ArrayList<WorldCoord> getCluster(WorldCoord chunkCoord){
         // WCoordList is the returning array, SearchList is the to-search list.
-        ArrayList<WorldCoord> WCoordList = new ArrayList<WorldCoord>();
-        ArrayList<WorldCoord> SearchList = new ArrayList<WorldCoord>();
+        ArrayList<WorldCoord> WCoordList = new ArrayList<>();
+        ArrayList<WorldCoord> SearchList = new ArrayList<>();
         SearchList.add(chunkCoord); // Adds 1st chunk to list
 
         // Iterates through SearchList, to create a full list of every adjacent cell.
