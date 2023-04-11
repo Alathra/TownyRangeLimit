@@ -1,2 +1,3 @@
-# Townblock max range when merging, joining, or inviting
+# Townblock max range when merging, joining, or inviting, see towny config for townblock size
+# With default settings this is equivalent to 1024 blocks
 townblockRangeMax: 64

@@ -24,10 +24,6 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
         this.getLogger().info("TownyRangeLimit loaded with limit of: " + this.getConfig().getInt("townblockRangeMax") + " townblocks");
     }
 
-    @Override
-    public void onDisable() {
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void doCheck(PlayerCommandPreprocessEvent event) {
         String[] args = event.getMessage().split(" ");
