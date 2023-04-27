@@ -41,7 +41,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                         int dist = shortestDistance(nation1, nation2, event.getPlayer());
 
                         if (dist > this.getConfig().getInt("townblockRangeMax")) {
-                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + nation2.getName() + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in either nation!");
+                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in either nation!");
                             event.setCancelled(true);
                         }
                     }
@@ -59,7 +59,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                         int dist = shortestDistance(town, nation, event.getPlayer());
 
                         if (dist > this.getConfig().getInt("townblockRangeMax")) {
-                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + town.getName() + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in your nation!");
+                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in your nation!");
                             event.setCancelled(true);
                         }
                     }
@@ -68,6 +68,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 else if (args[1].equalsIgnoreCase("join")) {
                     Nation nation = TownyAPI.getInstance().getNation(args[2]);
                     if(nation == null) return;
+
                     if(nation.isOpen()) {
                         Resident r = TownyAPI.getInstance().getResident(event.getPlayer());
                         if(r == null) return;
@@ -97,7 +98,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                         int dist = shortestDistance(town1, town2, event.getPlayer());
 
                         if (dist > this.getConfig().getInt("townblockRangeMax")) {
-                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + town2.getName() + " is too far away from your town. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest chunk in your town!");
+                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from your town. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest chunk in your town!");
                             event.setCancelled(true);
                         }
                     }
