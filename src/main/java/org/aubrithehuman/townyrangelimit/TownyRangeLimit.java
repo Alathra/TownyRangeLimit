@@ -2,6 +2,7 @@ package org.aubrithehuman.townyrangelimit;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownySettings;
+import com.palmergames.bukkit.towny.event.NationPreAddTownEvent;
 import com.palmergames.bukkit.towny.object.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,6 +26,22 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
+    public void nationInvite(NationPreAddTownEvent event) {
+        Town t = event.getTown();
+        Nation n = event.getNation();
+
+        Bukkit.getLogger().info("[TownyRangeLimit] Calculating between " + t.getName() + " and " + n.getName());
+        int dist = shortestDistance(t, n, event);
+
+        Bukkit.getLogger().info("[TownyRangeLimit] Calculated distance of " + dist + " between " + t.getName() + " and " + n.getName());
+        if (dist > this.getConfig().getInt("townblockRangeMax")) {
+            event.setCancelMessage("§c" + t.getName() + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in either nation!");
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void doCheck(PlayerCommandPreprocessEvent event) {
         String[] args = event.getMessage().split(" ");
         if(args.length >= 2) {
@@ -38,46 +55,12 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                         Nation nation2 = TownyAPI.getInstance().getNation(args[2]);
 
                         if(nation1 == null || nation2 == null) return;
+                        Bukkit.getLogger().info("[TownyRangeLimit] Calculating between " + nation1.getName() + " and " + nation2.getName());
                         int dist = shortestDistance(nation1, nation2, event.getPlayer());
+                        Bukkit.getLogger().info("[TownyRangeLimit] Calculated distance of " + dist + " between " + nation1.getName() + " and " + nation2.getName());
 
                         if (dist > this.getConfig().getInt("townblockRangeMax")) {
                             event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in either nation!");
-                            event.setCancelled(true);
-                        }
-                    }
-                }
-                //n invite
-                else if (args[1].equalsIgnoreCase("invite")) {
-                    if (!args[2].equalsIgnoreCase("deny") && !args[1].equalsIgnoreCase("accept")) {
-                        TownyWorld tw = WorldCoord.parseWorldCoord(event.getPlayer()).getTownyWorld();
-                        if(tw == null) return;
-                        Town town = tw.getTowns().get(args[2]);
-                        Resident r = TownyAPI.getInstance().getResident(event.getPlayer());
-                        if(r == null) return;
-                        Nation nation = r.getNationOrNull();
-
-                        int dist = shortestDistance(town, nation, event.getPlayer());
-
-                        if (dist > this.getConfig().getInt("townblockRangeMax")) {
-                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from any town in your nation. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in your nation!");
-                            event.setCancelled(true);
-                        }
-                    }
-                }
-                //n join (public)
-                else if (args[1].equalsIgnoreCase("join")) {
-                    Nation nation = TownyAPI.getInstance().getNation(args[2]);
-                    if(nation == null) return;
-
-                    if(nation.isOpen()) {
-                        Resident r = TownyAPI.getInstance().getResident(event.getPlayer());
-                        if(r == null) return;
-                        Town town = r.getTownOrNull();
-
-                        int dist = shortestDistance(town, nation, event.getPlayer());
-
-                        if (dist > this.getConfig().getInt("townblockRangeMax")) {
-                            event.getPlayer().sendMessage("§e[Towny] " + "§c" + nation.getName() + " is too far away from any town in your town. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest town in that nation!");
                             event.setCancelled(true);
                         }
                     }
@@ -95,7 +78,9 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
 
                         if(town1 == null || town2 == null) return;
 
+                        Bukkit.getLogger().info("[TownyRangeLimit] Calculating between " + town1.getName() + " and " + town2.getName());
                         int dist = shortestDistance(town1, town2, event.getPlayer());
+                        Bukkit.getLogger().info("[TownyRangeLimit] Calculated distance of " + dist + " between " + town1.getName() + " and " + town2.getName());
 
                         if (dist > this.getConfig().getInt("townblockRangeMax")) {
                             event.getPlayer().sendMessage("§e[Towny] " + "§c" + args[2] + " is too far away from your town. Must be within " + (this.getConfig().getInt("townblockRangeMax") * TownySettings.getTownBlockSize()) + " blocks of the nearest chunk in your town!");
@@ -107,13 +92,14 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
         }
     }
 
+
     /**
      * Finds the shortest distance (in townblocks) between two towns
      * @param town1 town1
      * @param town2 town1
      * @return shortest distance
      */
-    private static int shortestDistance(Town town1, Town town2, Player p) {
+    private static int shortestDistance(Town town1, Town town2, Player e) {
         //max possible range (60M*sqrt2)
         // 16 is block size
         int dist = 84852814 / 16;
@@ -122,12 +108,12 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
             TownBlock townHomeBlock2 = town2.getHomeBlockOrNull();
             if(townHomeBlock1 == null) {
                 Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + town1.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                p.sendMessage("[TownyRangeLimit] " + town1.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                e.sendMessage("[TownyRangeLimit] " + town1.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
                 return dist;
             }
             if(townHomeBlock2 == null) {
                 Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + town2.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                p.sendMessage("[TownyRangeLimit] " + town2.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                e.sendMessage("[TownyRangeLimit] " + town2.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
                 return dist;
             }
             ArrayList<WorldCoord> clusterInvited = getCluster(townHomeBlock1.getWorldCoord());
@@ -188,7 +174,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
      * @param nation nation
      * @return shortest distance
      */
-    private static int shortestDistance(Town town, Nation nation, Player p) {
+    private static int shortestDistance(Town town, Nation nation, NationPreAddTownEvent e) {
         //max possible range (60M*sqrt2)
         // 16 is block size
         int dist = 84852814 / 16;
@@ -196,7 +182,8 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
             TownBlock townHomeBlockM = town.getHomeBlockOrNull();
             if(townHomeBlockM == null) {
                 Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + town.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                p.sendMessage("[TownyRangeLimit] " + town.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                e.setCancelMessage("[TownyRangeLimit] " + town.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                e.setCancelled(true);
                 return dist;
             }
             ArrayList<WorldCoord> clusterInvited = getCluster(townHomeBlockM.getWorldCoord());
@@ -210,7 +197,8 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 TownBlock townHomeBlock = t.getHomeBlockOrNull();
                 if(townHomeBlock == null) {
                     Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                    p.sendMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                    e.setCancelMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                    e.setCancelled(true);
                     return dist;
                 }
                 clustersInviter.add(getCluster(townHomeBlock.getWorldCoord()));
@@ -275,7 +263,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
      * @return shortest distance
      */
 
-    private static int shortestDistance(Nation nation1, Nation nation2, Player p) {
+    private static int shortestDistance(Nation nation1, Nation nation2, Player e) {
         //max possible range (60M*sqrt2)
         // 16 is block size
         int dist = 84852814 / 16;
@@ -288,7 +276,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 TownBlock townHomeBlock = t.getHomeBlockOrNull();
                 if(townHomeBlock == null) {
                     Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                    p.sendMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                    e.sendMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
                     return dist;
                 }
                 clustersInviter.add(getCluster(townHomeBlock.getWorldCoord()));
@@ -304,7 +292,7 @@ public final class TownyRangeLimit extends JavaPlugin implements Listener {
                 TownBlock townHomeBlock = t.getHomeBlockOrNull();
                 if(townHomeBlock == null) {
                     Bukkit.getLogger().log(Level.SEVERE, "[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
-                    p.sendMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
+                    e.sendMessage("[TownyRangeLimit] " + t.getName() + " has not set a home block! Town must have a homeblock! Failing automatically.");
                     return dist;
                 }
                 clustersInvited.add(getCluster(townHomeBlock.getWorldCoord()));
